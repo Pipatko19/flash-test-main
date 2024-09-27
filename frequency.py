@@ -17,21 +17,22 @@ class WordProperties:
 
 class Corpus:
     """initializes the frequency data"""
-    def __init__(self) -> None:
+    def __init__(self, corpus="syn2015_lemma_utf8.tsv") -> None:
         self.words = dict()
-        with open("syn2015_lemma_utf8.tsv", "r") as csv_file:
+        with open(corpus, "r") as csv_file:
             contents = csv.reader(csv_file, delimiter="\t")
             for word in contents:
                 name = word[1].lower()
-                info = word[2:]
+                freq = int(word[2])
+                #ignores words smaller than 4 for optimalization
                 if len(name) > 3 and name not in self.words:
-                    self.words[name] = WordProperties(*info)
+                    self.words[name] = freq
     def get_words(self):
         """getter"""
         return self.words
     def print_info(self) -> None:
         """returns the word and its frequency, debug purposes"""
-        print(sorted([(name, properties.freq) for name, properties in self.words.items()], key=lambda x: x[1]))
+        print(sorted([(name, freq) for name, freq in self.words.items()], key=lambda x: x[1]))
 
 corpus = Corpus()
 

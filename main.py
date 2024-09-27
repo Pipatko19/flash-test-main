@@ -90,7 +90,7 @@ class App(ttk.Window):
             elif word and word[0].isupper():
                 tag = "Name"
             elif word in self.word_data or (not word.isalpha()):
-                if word.isalpha() and self.word_data[word].freq < 1000:
+                if word.isalpha() and self.word_data[word] < 1000:
                     tag = "Uncommon"
                 else:
                     tag = "Normal"
