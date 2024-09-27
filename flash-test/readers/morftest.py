@@ -8,7 +8,7 @@ class Lemmatizator:
     def __init__(self, modelpath: str = 'czech-morfflex2.0-pdtc1.0-220710-pos_only.tagger') -> None:
         """Initializes the language model"""
 
-        self.tagger = ufal.morphodita.Tagger.load(modelpath)
+        self.tagger = ufal.morphodita.Tagger.load("data/" + modelpath)
         if not self.tagger:
             raise Exception("Cannot load the tagger model!")
 

@@ -19,7 +19,7 @@ class Corpus:
     """initializes the frequency data"""
     def __init__(self, corpus="syn2015_lemma_utf8.tsv") -> None:
         self.words = dict()
-        with open(corpus, "r") as csv_file:
+        with open("data/" + corpus, "r") as csv_file:
             contents = csv.reader(csv_file, delimiter="\t")
             for word in contents:
                 name = word[1].lower()
