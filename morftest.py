@@ -6,9 +6,8 @@ nltk.download('punkt_tab')
 class Lemmatizator:
     "Lemmatizes yes"
     def __init__(self, modelpath: str = 'czech-morfflex2.0-pdtc1.0-220710-pos_only.tagger') -> None:
-        """Initializes the language model, singleton"""
+        """Initializes the language model"""
 
-        # Path to the Czech model
         self.tagger = ufal.morphodita.Tagger.load(modelpath)
         if not self.tagger:
             raise Exception("Cannot load the tagger model!")
@@ -70,22 +69,12 @@ lemmatizator = Lemmatizator()
     
 if __name__ == "__main__":
     # Text to be analyzed
-    text1 =  """Kniha nás uvítá k životu na Panské farmě vlastněnou panem Jonesem
-            který se ke zvířatům chová převážně krutě (až na nějaké vyjímky - klisně Molině podává cukr).
-            Když je jednou Jones zapomene nakrmit, zvířata vzbudí revoluci a úspěšně odeženou Jonese pryč,
-            čímž se osvobodí a přivlastní si farmu.""" 
-    text2 = "Šel jsem do lesa a potkal dlažební kostku \n\n A byla úplně úžasná"
-    text3 = """Knihu napsala Alice Feeney Britská spisovatelka tohoto století, která píše převážně mysteriózní knihy. Z angličtiny knihu přeložila Michaela Martinová.
-            Literárním druhem je epika
-            žánr je psychologický thriller a román. a pak jsem šel nakoupit vodu
-            Kompozice je chronologická s prvky retrospektivy. 
-            Kniha je psaná převážně v ich-formě
-            Hlavním tématem knihy je nešťastné manželství a tajemství, které ho doprovází. V příběhu se nachází 3 hlavní postavy, kterým je okolo 40 let.
-            hlavní vypravěč se neustále střídá mezi Adamem, Amélií a Robin. Takže vidíme u každé postavy jejich úhel pohledu a myšlenky
+    text1 = """Vítr skoro nefouká a tak by se na první pohled mohlo zdát, 
+            že se balónky snad vůbec nepohybují. Jenom tak klidně levitují ve vzduchu. 
+            Jelikož slunce jasně září a na obloze byste od východu k západu hledali mráček marně, 
+            balónky působí jako jakási fata morgána uprostřed pouště. Zkrátka široko daleko nikde nic, 
+            jen zelenkavá tráva, jasně modrá obloha a tři křiklavě barevné pouťové balónky, 
+            které se téměř nepozorovatelně pohupují ani ne moc vysoko, ani moc nízko nad zemí.
             """
-    text4 = """Kočka leze dírou \n Pes oknem"""
 
     print(lemmatizator.print_info(text1))
-    print(lemmatizator.get_lemmas(text2))
-    print(lemmatizator.get_lemmas(text3))
-    print(lemmatizator.get_lemmas(text4))
