@@ -1,7 +1,9 @@
 import re
+import numpy as np
 
 from model import AppModel
 from view import AppView
+
 
 class AppController:
     def __init__(self, model: AppModel, view: AppView) -> None:
@@ -10,7 +12,23 @@ class AppController:
         self.view.btn_randomizer.config(command=self.convert)
         self.view.pack(expand=True, fill='both')
         
-    def _format_lemmas(self, text) -> list[str]:
+    def lower_bound(self, text: list):
+        """calculates the lower_bound on a logarithmic scale"""
+        data = self.model.get_word_data()
+        frequencies = []
+        for word in text:
+            if word in data:
+                frequencies.append(data[word])
+        frequencies = np.log10(frequencies)
+        print(frequencies)
+        log_mean = np.mean(frequencies)
+        log_std = np.std(frequencies)
+        print("mean", log_mean)
+        print("std", log_std)
+        return log_mean - log_std
+                
+        
+    def _format_lemmas(self, text: str) -> list[str]:
         """format the text before giving it to the lemanizator."""
         print("text:", text)
         concat_text = " ¶ ".join(text.splitlines()) #why does it have to be so stupid
@@ -53,7 +71,7 @@ class AppController:
         self.model.user_text = text
         word_indices = self._find_word_indices(text)
         lemmas = self._format_lemmas(text)
-
+        print(self.lower_bound(lemmas))
         for idx, word in enumerate(lemmas):
             if len(word) <= 3:
                 tag = "Short"

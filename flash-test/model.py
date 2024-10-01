@@ -6,6 +6,7 @@ class AppModel:
     def __init__(self):
         self.word_data = corpus.get_words()
         self.lemm = lemmatizator
+        self._score_mean: int = None
         self._user_text: str = None
         
     @property

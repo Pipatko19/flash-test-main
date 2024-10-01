@@ -11,5 +11,5 @@ if __name__ == "__main__":
     model = AppModel()
     view = AppView(root)
     controller = AppController(model, view)
-    view.pack
+    view.pack()
     root.mainloop()
