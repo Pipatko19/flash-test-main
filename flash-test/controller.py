@@ -22,17 +22,17 @@ class AppController:
         frequencies = np.log10(frequencies)
         print(frequencies)
         log_mean = np.mean(frequencies)
-        log_std = np.std(frequencies)
-        print("mean", log_mean)
-        print("std", log_std)
+        log_std = np.std(frequencies) * self.model.bound_mute
+        print("mean:", log_mean)
+        print("std:", log_std)
         return log_mean - log_std
                 
         
     def _format_lemmas(self, text: str) -> list[str]:
         """format the text before giving it to the lemanizator."""
-        print("text:", text)
+        #print("text:", text)
         concat_text = " ¶ ".join(text.splitlines()) #why does it have to be so stupid
-        print("concat_text:", concat_text)
+        #print("concat_text:", concat_text)
         lemmas = self.model.get_lemmatizator().get_lemmas(concat_text)
         print("lemmas:", lemmas)
         return lemmas
@@ -44,7 +44,6 @@ class AppController:
         between_symbols = {"-", "/", "="}
         past_char_count = 0
         for i in range(len(test_str)):
-        
             if re.match(r'^[^\w]+$', test_str[i]):
                 if not (test_str[i] in between_symbols and
                     (i != 0 and test_str[i - 1].isalpha()) and
@@ -71,14 +70,16 @@ class AppController:
         self.model.user_text = text
         word_indices = self._find_word_indices(text)
         lemmas = self._format_lemmas(text)
-        print(self.lower_bound(lemmas))
+        self.model.score_bound = self.lower_bound(lemmas)
         for idx, word in enumerate(lemmas):
             if len(word) <= 3:
                 tag = "Short"
             elif word and word[0].isupper():
                 tag = "Name"
-            elif word in self.model.get_word_data() or (not word.isalpha()):
-                if word.isalpha() and self.model.get_word_data()[word] < 1000:
+            elif not word.isalpha():
+                tag = "Normal"
+            elif word in self.model.get_word_data():
+                if np.log10(self.model.get_word_data()[word]) < self.model.score_bound:
                     tag = "Uncommon"
                 else:
                     tag = "Normal"
