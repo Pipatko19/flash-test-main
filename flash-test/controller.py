@@ -3,13 +3,14 @@ import numpy as np
 
 from model import AppModel
 from view import AppView
-
+from settings import Settings
 
 class AppController:
     def __init__(self, model: AppModel, view: AppView) -> None:
         self.model = model
         self.view = view
         self.view.btn_randomizer.config(command=self.convert)
+        self.view.btn_settings.config(command=self.open_settings)
         self.view.pack(expand=True, fill='both')
         
     def lower_bound(self, text: list):
@@ -86,3 +87,5 @@ class AppController:
             else:
                 tag = "Not_Found"
             self.view.update_tags(tag, *word_indices[idx])
+    def open_settings(self):
+        Settings(self.view, self.model)

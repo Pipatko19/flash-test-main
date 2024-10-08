@@ -1,7 +1,10 @@
 import tkinter as tk
 import ttkbootstrap as ttk
+from PIL import Image, ImageTk
 from ttkbootstrap import constants as cn
 from ttkbootstrap.scrolled import ScrolledText
+
+
 
 class AppView(ttk.Frame):
     def __init__(self, root):
@@ -11,28 +14,46 @@ class AppView(ttk.Frame):
         
         super().__init__(root)
 
-        style = ttk.Style()
-        style.configure("TButton", font=("garamond", 15))
+        self.icon = ImageTk.PhotoImage(file="./resources/settings_icon.png")
+        self.icon_hovered = ImageTk.PhotoImage(file="./resources/settings_icon_hovered.png")
 
-        lfm_upper = ttk.LabelFrame(self, text="title", style=cn.WARNING)
-        lfm_upper.grid(column=0, row=0)
+
+        style = ttk.Style()     
+        style.configure(".", font=("garamond"))
+        style.configure("TButton", font=("garamond", 15))
+        style.configure("Invisible.TButton",  borderwidth=0, relief="flat", background="white")   
+        style.map("Invisible.TButton", background=[("active", "white")], foreground=[("active", "green")])
+        
+        frm_display = ttk.Frame(self)
+        frm_display.grid(column=0, row=0, columnspan=3, sticky="ew")        
+
+        lfm_upper = ttk.LabelFrame(frm_display, text="title", style=cn.WARNING)
+        lfm_upper.pack()
+
         lbl_upper_text = ttk.Label(lfm_upper, text= "Text Randomizer", font=("garamond", 30, "bold"), padding=10)
         lbl_upper_text.pack()
 
-        self.txt_input_field: tk.Text = ScrolledText(self, font="garamond 12", autohide=True)
-        self.txt_input_field.grid(column=0, row=1, sticky="ew", padx=20)
+        self.txt_input_field: tk.Text = ScrolledText(frm_display, font="garamond 12", autohide=True)
+        self.txt_input_field.pack(fill="both", expand=True, padx=20)
 
-        #tags
+        # tags
         self.txt_input_field.tag_configure("Uncommon", background="#FF8C00")
         self.txt_input_field.tag_configure("Name", background="yellow")
         self.txt_input_field.tag_configure("Not_Found", background="red")
         self.txt_input_field.tag_configure("Short", background="#FAEBD7")
         self.txt_input_field.tag_configure("Normal", background="white")
         
-        self.btn_randomizer = ttk.Button(self, text="Convert", width=20, style=("WARNING-TButton"))
-        self.btn_randomizer.grid(column=0, row=2, ipadx=50, ipady=10, pady=20)
         
-        self.columnconfigure([0], weight=1, minsize=500)
+        self.btn_randomizer = ttk.Button(self, text="Convert", width=20, style=("WARNING.TButton"))
+        self.btn_randomizer.grid(column=1, row=1, ipadx=50, ipady=10, pady=20)
+        
+        self.btn_settings = ttk.Button(self, image=self.icon, style="Invisible.TButton")
+        self.btn_settings.grid(column=2, row=1, sticky="n")
+        
+        self.btn_settings.bind("<Enter>", lambda event: self.btn_settings.config(image=self.icon_hovered))
+        self.btn_settings.bind("<Leave>", lambda event: self.btn_settings.config(image=self.icon))
+        
+        self.columnconfigure([0, 1, 2], weight=1, minsize=100)
         
     def get_txt_input(self):
         return self.txt_input_field.get("1.0", tk.END)
@@ -40,6 +61,8 @@ class AppView(ttk.Frame):
     def update_tags(self, tag, start, end):
         self.txt_input_field.tag_add(tag, start, end)
     
-if __name__ == '__main__':
-    app = AppView()
+if __name__ == "__main__":
+    app = ttk.Window(themename='simplex')
+    view = AppView(app)
+    view.pack()
     app.mainloop()
