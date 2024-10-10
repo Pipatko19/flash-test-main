@@ -1,6 +1,6 @@
 import tkinter as tk
 import ttkbootstrap as ttk
-from PIL import Image, ImageTk
+from PIL import ImageTk
 from ttkbootstrap import constants as cn
 from ttkbootstrap.scrolled import ScrolledText
 
@@ -19,9 +19,10 @@ class AppView(ttk.Frame):
 
 
         style = ttk.Style()     
-        style.configure(".", font=("garamond"))
-        style.configure("TButton", font=("garamond", 15))
+        style.configure(".", font=("garamond", 13))
+        style.configure("Random.TButton", font=("garamond", 15), background="orange")
         style.configure("Invisible.TButton",  borderwidth=0, relief="flat", background="white")   
+
         style.map("Invisible.TButton", background=[("active", "white")], foreground=[("active", "green")])
         
         frm_display = ttk.Frame(self)
@@ -44,7 +45,7 @@ class AppView(ttk.Frame):
         self.txt_input_field.tag_configure("Normal", background="white")
         
         
-        self.btn_randomizer = ttk.Button(self, text="Convert", width=20, style=("WARNING.TButton"))
+        self.btn_randomizer = ttk.Button(self, text="Convert", width=20, style=("Random.TButton"))
         self.btn_randomizer.grid(column=1, row=1, ipadx=50, ipady=10, pady=20)
         
         self.btn_settings = ttk.Button(self, image=self.icon, style="Invisible.TButton")

@@ -3,7 +3,7 @@ import numpy as np
 
 from model import AppModel
 from view import AppView
-from settings import Settings
+from settings.settings_main import Settings
 
 class AppController:
     def __init__(self, model: AppModel, view: AppView) -> None:
@@ -14,7 +14,7 @@ class AppController:
         self.view.pack(expand=True, fill='both')
         
     def lower_bound(self, text: list):
-        """calculates the lower_bound on a logarithmic scale"""
+        """calculate the lower bound on a logarithmic scale"""
         data = self.model.get_word_data()
         frequencies = []
         for word in text:
@@ -73,19 +73,23 @@ class AppController:
         lemmas = self._format_lemmas(text)
         self.model.score_bound = self.lower_bound(lemmas)
         for idx, word in enumerate(lemmas):
-            if len(word) <= 3:
+            if word in self.model.blacklist or not word.isalpha():
+                tag = None
+            elif len(word) <= 3:
                 tag = "Short"
             elif word and word[0].isupper():
                 tag = "Name"
-            elif not word.isalpha():
-                tag = "Normal"
             elif word in self.model.get_word_data():
                 if np.log10(self.model.get_word_data()[word]) < self.model.score_bound:
                     tag = "Uncommon"
                 else:
-                    tag = "Normal"
+                    tag = None
             else:
                 tag = "Not_Found"
-            self.view.update_tags(tag, *word_indices[idx])
+            
+            if tag is not None:
+                self.view.update_tags(tag, *word_indices[idx])
     def open_settings(self):
-        Settings(self.view, self.model)
+        if not hasattr(self, "settings_window") or not self.settings_window.winfo_exists():
+            self.settings_window = Settings(self.view, self.model)
+            self.settings_window.attributes("-topmost", "true")
