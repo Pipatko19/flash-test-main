@@ -13,9 +13,9 @@ class AppController:
         self.view.btn_settings.config(command=self.open_settings)
         self.view.pack(expand=True, fill='both')
         
-    def lower_bound(self, text: list):
+    def lower_bound(self, text: list) -> float:
         """calculate the lower bound on a logarithmic scale"""
-        data = self.model.get_word_data()
+        data = self.model.word_data
         frequencies = []
         for word in text:
             if word in data:
@@ -30,11 +30,11 @@ class AppController:
                 
         
     def _format_lemmas(self, text: str) -> list[str]:
-        """format the text before giving it to the lemanizator."""
+        """formats the text before giving it to the lemanizator."""
         #print("text:", text)
         concat_text = " ¶ ".join(text.splitlines()) #why does it have to be so stupid
         #print("concat_text:", concat_text)
-        lemmas = self.model.get_lemmatizator().get_lemmas(concat_text)
+        lemmas = self.model.lemmatizator.get_lemmas(concat_text)
         print("lemmas:", lemmas)
         return lemmas
     
@@ -65,7 +65,7 @@ class AppController:
         return word_indices
 
 
-    def convert(self):
+    def convert(self) -> None:
         """Hides the least common words in the text field."""
         text = self.view.get_txt_input()
         self.model.user_text = text
@@ -79,8 +79,8 @@ class AppController:
                 tag = "Short"
             elif word and word[0].isupper():
                 tag = "Name"
-            elif word in self.model.get_word_data():
-                if np.log10(self.model.get_word_data()[word]) < self.model.score_bound:
+            elif word in self.model.word_data:
+                if np.log10(self.model.word_data[word]) < self.model.score_bound:
                     tag = "Uncommon"
                 else:
                     tag = None
@@ -90,6 +90,7 @@ class AppController:
             if tag is not None:
                 self.view.update_tags(tag, *word_indices[idx])
     def open_settings(self):
+        """Creates settings window."""
         if not hasattr(self, "settings_window") or not self.settings_window.winfo_exists():
             self.settings_window = Settings(self.view, self.model)
             self.settings_window.attributes("-topmost", "true")

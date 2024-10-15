@@ -5,10 +5,10 @@ nltk.download('punkt_tab')
 
 class Lemmatizator:
     "Lemmatizes yes"
-    def __init__(self, modelpath: str = 'czech-morfflex2.0-pdtc1.0-220710-pos_only.tagger') -> None:
+    def __init__(self, modelpath: str) -> None:
         """Initializes the language model"""
 
-        self.tagger = ufal.morphodita.Tagger.load("data/" + modelpath)
+        self.tagger = ufal.morphodita.Tagger.load(modelpath)
         if not self.tagger:
             raise Exception("Cannot load the tagger model!")
 
@@ -65,9 +65,9 @@ class Lemmatizator:
             formatted_lemmas.append(lemma)
         return formatted_lemmas
 
-lemmatizator = Lemmatizator()
     
 if __name__ == "__main__":
+    lemmatizator = Lemmatizator()
     # Text to be analyzed
     text1 = """Vítr skoro nefouká a tak by se na první pohled mohlo zdát, 
             že se balónky snad vůbec nepohybují. Jenom tak klidně levitují ve vzduchu. 
