@@ -12,6 +12,7 @@ class AppController:
         self.view.btn_randomizer.config(command=self.convert)
         self.view.btn_settings.config(command=self.open_settings)
         self.view.pack(expand=True, fill='both')
+
         
     def lower_bound(self, text: list) -> float:
         """calculate the lower bound on a logarithmic scale"""
