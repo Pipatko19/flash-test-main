@@ -1,5 +1,6 @@
 from readers.morftest import Lemmatizator
 from readers.frequency import Corpus
+from entry_name import NamedEntry
 
 
 class AppModel:
@@ -10,8 +11,8 @@ class AppModel:
         self.score_bound: float = None
         self._user_text: str = None
         self.blacklist: set = AppModel.read_blacklist()
+        self.entries: list[NamedEntry | str] = []
         
-
     @property
     def user_text(self):
         return self._user_text
@@ -42,6 +43,11 @@ class AppModel:
             for word in f:
                 data.add(word.strip())
         return data
+    
+    def clear_entries(self):
+        for entry, index in self.entries:
+            entry.destroy()
+        self.entries.clear()
     
     def save_blacklist(self) -> None:
         with open("data/blacklisted_words.txt", "w") as f:

@@ -65,31 +65,25 @@ class AppController:
             word_indices.append((".".join(map(str, proc_start)), str(start_index[0]) + "." + str(len(test_str) - past_char_count)))
         return word_indices
 
-
     def convert(self) -> None:
         """Hides the least common words in the text field."""
+        self.model.clear_entries()
+        print(self.model.entries)
         text = self.view.get_txt_input()
         self.model.user_text = text
         word_indices = self._find_word_indices(text)
         lemmas = self._format_lemmas(text)
         self.model.score_bound = self.lower_bound(lemmas)
         for idx, word in enumerate(lemmas):
-            if word in self.model.blacklist or not word.isalpha():
-                tag = None
-            elif len(word) <= 3:
-                tag = "Short"
-            elif word and word[0].isupper():
-                tag = "Name"
-            elif word in self.model.word_data:
+            print(word)
+            if word not in self.model.blacklist and word.isalpha() and len(word) > 3:
+                if word[0].isupper():
+                    continue
+                if word not in self.model.word_data:
+                    continue
                 if np.log10(self.model.word_data[word]) < self.model.score_bound:
-                    tag = "Uncommon"
-                else:
-                    tag = None
-            else:
-                tag = "Not_Found"
-            
-            if tag is not None:
-                self.view.update_tags(tag, *word_indices[idx])
+                    self.view.create_entry(word, word_indices[idx])
+                    
     def open_settings(self):
         """Creates settings window."""
         if not hasattr(self, "settings_window") or not self.settings_window.winfo_exists():

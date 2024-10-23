@@ -9,7 +9,7 @@ if __name__ == "__main__":
     root = ttk.Window(themename="simplex")
     root.title("Tester")
     root.geometry("1200x900")
-    view = AppView(root)
+    view = AppView(root, model)
     controller = AppController(model, view)
     view.pack()
     root.mainloop()
