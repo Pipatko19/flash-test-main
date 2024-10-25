@@ -1,60 +1,54 @@
 import tkinter as tk
+from tkinter import scrolledtext, font
+from ttkbootstrap import Style
 
-def on_scroll(*args):
-    text_widget.yview(*args)
-    update_entry_positions()
+def create_font_from_style(style, widget="TLabel"):
+    # Get font description from ttk style, e.g., "garamond 13"
+    font_description = style.lookup(widget, "font")
+    if font_description:
+        # Split the font description (e.g., "garamond 13" -> family="garamond", size=13)
+        font_parts = font_description.split()
+        font_family = font_parts[0]
+        font_size = int(font_parts[1])
+        
+        # Create and return a new Font object with this family and size
+        return font.Font(family=font_family, size=font_size)
+    else:
+        # Fallback if style lookup fails
+        return font.Font(size=12)
 
-def update_entry_positions():
-    for index, entry in entries:
-        bbox = text_widget.bbox(index)
-        if bbox is not None:
-            # Entry is visible, update position
-            entry_width = entry.winfo_reqwidth()  # Get the width of the entry
-            entry.place(x=bbox[0], y=bbox[1], width=entry_width)
-            entry.lift()  # Ensure the entry is on top of the text widget
-        else:
-            # Entry is out of view, hide it
-            entry.place_forget()
+def get_word_pixel_width(word, font_obj):
+    # Calculate width of the word based on the font object
+    return font_obj.measure(word)
 
-def on_mouse_wheel(event):
-    if event.delta:  # Handle Windows and Mac scroll
-        text_widget.yview_scroll(-1 * int(event.delta / 120), "units")
-    else:  # Linux uses event.num
-        if event.num == 4:
-            text_widget.yview_scroll(-1, "units")
-        elif event.num == 5:
-            text_widget.yview_scroll(1, "units")
-    update_entry_positions()
+def create_entry_on_word():
+    text_content = scrolled_text.get("1.0", "end-1c")
+    words = text_content.split()
+    
+    # Create a default font object from the ttk style
+    default_font = create_font_from_style(style)
+    
+    for word in words:
+        start_index = scrolled_text.search(word, "1.0", tk.END)
+        
+        if start_index:
+            entry_width_px = get_word_pixel_width(word, default_font)
+            entry_width_chars = round(entry_width_px / default_font.measure('0'))
+            
+            entry = tk.Entry(root, width=entry_width_chars)
+            entry.insert(0, word)
+            entry.pack()  # Replace with positioning as needed
 
 root = tk.Tk()
+root.geometry("400x300")
 
-# Create Text widget and Scrollbar
-text_widget = tk.Text(root, wrap='word', height=10, width=40)
-scrollbar = tk.Scrollbar(root, command=on_scroll)
-text_widget.config(yscrollcommand=scrollbar.set)
+# Initialize ttkbootstrap style
+style = Style("cosmo")
+scrolled_text = scrolledtext.ScrolledText(root, wrap=tk.WORD)
+scrolled_text.pack(expand=True, fill="both")
+scrolled_text.insert("1.0", "This is a sample text. Press the button to create entries over each word.")
 
-text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-# Add some text
-for i in range(50):
-    text_widget.insert('end', f"Line {i+1}\n")
-
-# Create Entry widgets and place them on specific lines
-entries = []
-for i in range(10, 20):  # Place entries between line 10 and 20
-    entry = tk.Entry(root)
-    entry_width = i * 2  # Give each entry a different width for demonstration
-    entry.config(width=entry_width)  # Set the width of the entry
-    index = f"{i}.0"  # Line number in the Text widget
-    bbox = text_widget.bbox(index)
-    if bbox:
-        entry.place(x=bbox[0], y=bbox[1], width=entry.winfo_reqwidth())
-    entries.append((index, entry))
-
-# Bind the mousewheel scrolling event
-root.bind_all('<MouseWheel>', on_mouse_wheel)  # For Windows and MacOS
-root.bind_all('<Button-4>', on_mouse_wheel)    # For Linux (scroll up)
-root.bind_all('<Button-5>', on_mouse_wheel)    # For Linux (scroll down)
+button = tk.Button(root, text="Create Entry on Word", command=create_entry_on_word)
+button.pack()
 
 root.mainloop()

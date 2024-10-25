@@ -4,6 +4,7 @@ import ttkbootstrap as ttk
 from PIL import ImageTk
 from ttkbootstrap import constants as cn
 from ttkbootstrap.scrolled import ScrolledText
+import tkinter.font
 
 from model import AppModel
 from entry_name import NamedEntry
@@ -19,6 +20,7 @@ class AppView(ttk.Frame):
 
         self.icon = ImageTk.PhotoImage(file="./resources/settings_icon.png")
         self.icon_hovered = ImageTk.PhotoImage(file="./resources/settings_icon_hovered.png")
+
 
 
         style = ttk.Style()     
@@ -37,6 +39,7 @@ class AppView(ttk.Frame):
         lbl_upper_text = ttk.Label(lfm_upper, text= "Text Randomizer", font=("garamond", 30, "bold"), padding=10)
 
         self.txt_input_field: tk.Text = ScrolledText(self.frm_display, font="garamond 12", autohide=True)
+        self.default_font = tkinter.font.Font(family="garamond", size=9)
         
         self.frm_display.grid(column=0, row=0, columnspan=3, sticky="ew")        
         lfm_upper.pack()
@@ -65,23 +68,28 @@ class AppView(ttk.Frame):
     
     def create_entry(self, word: str, indices: list[str | float]) -> None:
         """replaces the word at the indices with an entry.
+        Fuckin nefunguje protože word je lemma ne normální token aaaaaah
 
         Args:
             word (str): word
             indices (list[str  |  float]): starting and ending index
         """
+        width = self._calculate_width(word)
+        print("width:", width)
+        
+        entry = NamedEntry(word, width, master=self.txt_input_field, font=('garamond', 9))
+        entry.insert_placeholder()
+        self.model.entries.append((entry, indices[0]))
+
         
         bbox = self.txt_input_field.bbox(indices[0])
         if bbox is not None:
             start_x, y, width, height = bbox
-            print(height)
-            end_x = self.txt_input_field.bbox(indices[1])[0]
-            entry = NamedEntry(word, end_x - start_x, master=self.txt_input_field, font=('garamond', 9))
-            entry.insert_placeholder()
-
-            self.model.entries.append((entry, indices[0]))
-
+            #end_x = self.txt_input_field.bbox(indices[1])[0]
             entry.place(x=start_x - 3, y=y, width=entry.get_width(), height=30)
+
+
+
         self.txt_input_field.update_idletasks()
     
     def on_mouse_wheel(self, event):
@@ -105,6 +113,10 @@ class AppView(ttk.Frame):
             else:
                 # Entry is out of view, hide it
                 entry.place_forget()
+    
+    def _calculate_width(self, word):
+        return self.default_font.measure(word)
+
 
 if __name__ == "__main__":
     app = ttk.Window(themename='simplex')
