@@ -2,6 +2,7 @@ import ttkbootstrap as ttk
 
 class NamedEntry(ttk.Entry):
     def __init__(self, word: str, width: int, *args, **kwargs):
+        #Entry with an assigned word.
         super().__init__(*args, **kwargs)
         self.word = word
         self.set_width = width + 4
@@ -12,10 +13,12 @@ class NamedEntry(ttk.Entry):
         self.bind("<Return>", self.unfocus)
         
     def insert_placeholder(self):
+        #Writes the hidden word.
         self.delete(0, ttk.END)
         self.insert(0, self.placeholder)
         
     def correct_update(self):
+        #Writes the whole word.
         self.delete(0, ttk.END)
         self.insert(0, self.word)
         
@@ -23,6 +26,7 @@ class NamedEntry(ttk.Entry):
         return self.set_width
     
     def unfocus(self, event):
+        #Checks the state of the entry when the user stops focusing.
         cur_value = self.get().strip().lower()
         if cur_value == "skip":
             cur_value = self.word.lower()

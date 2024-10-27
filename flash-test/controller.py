@@ -22,7 +22,7 @@ class AppController:
             if word in data:
                 frequencies.append(data[word])
         frequencies = np.log10(frequencies)
-        print(frequencies)
+        #print(frequencies)
         log_mean = np.mean(frequencies)
         log_std = np.std(frequencies) * self.model.bound_mute
         print("mean:", log_mean)
@@ -39,35 +39,31 @@ class AppController:
         print("lemmas:", lemmas)
         return lemmas
     
-    def _find_word_indices(self, test_str) -> list[str | float]:
-        """finds the starting and ending indices of each word."""
-        word_indices = []
-        start_index = [1, 0]
-        between_symbols = {"-", "/", "=", ";", ".", ","}
-        past_char_count = 0
-        for i in range(len(test_str)):
-            if re.match(r'^[^\w]+$', test_str[i]):
-                if not (test_str[i] in between_symbols and
-                    (i != 0 and test_str[i - 1].isalpha()) and
-                    (i != len(test_str) and test_str[i + 1].isalpha())):
-                    if start_index[1] != i:
-                        proc_start = list(start_index)
-                        proc_start[1] -= past_char_count
-                        
-                        word_indices.append((".".join(map(str, proc_start)), 
-                                             str(start_index[0]) + "." + str(i - past_char_count)))
-                if test_str[i] == "\n":
-                    start_index[0] += 1
-                    past_char_count = i + 1
-                start_index[1] = i + 1
-                
-        if start_index[1] != len(test_str):
-            proc_start = list(start_index)
-            proc_start[1] -= past_char_count
-            word_indices.append((".".join(map(str, proc_start)), str(start_index[0]) + "." + str(len(test_str) - past_char_count)))
-        
-        print("registered words:", *(self.view.txt_input_field.get(start, end) for start, end in word_indices), sep=", ")
-        return word_indices
+    def _find_word_indices(self, text) -> list[str | float]:
+        """finds the starting and ending index of each word (in "y.x" format)"""
+        word_indexes = []
+        pattern = re.compile(r'\b[\w./,-]+(?:[\w./,-]+)*\b')  # Pattern for words with hyphens and decimal points
+        y = 1
+        prev = -1
+        i = 0  
+        while i < len(text):
+            if text[i] == '\n':
+                y += 1 
+                prev = i
+                i += 1
+            else:
+                # Check for word using the regex pattern from the current position
+                match = pattern.match(text[i:])
+                if match:
+                    start_index = i - prev - 1
+                    word_length = len(match.group())
+                    end_index = start_index + word_length
+                    word_indexes.append((str(y) + "." + str(start_index), str(y) + "." + str(end_index)))
+                    i += word_length 
+                else:
+                    i += 1  # Move forward if no match
+        print("INDEXES:", *(self.view.txt_input_field.get(start,end) for start, end in word_indexes), sep=", ")
+        return word_indexes
 
     def convert(self) -> None:
         """Hides the least common words in the text field."""

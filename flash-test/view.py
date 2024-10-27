@@ -21,8 +21,6 @@ class AppView(ttk.Frame):
         self.icon = ImageTk.PhotoImage(file="./resources/settings_icon.png")
         self.icon_hovered = ImageTk.PhotoImage(file="./resources/settings_icon_hovered.png")
 
-
-
         style = ttk.Style()     
         style.configure(".", font=("garamond", 13))
         style.configure("Random.TButton", font=("garamond", 15), background="orange")
@@ -96,6 +94,7 @@ class AppView(ttk.Frame):
         self.txt_input_field.update_idletasks()
     
     def on_mouse_wheel(self, event):
+        """scrolls the text by a consistent ammount"""
         if event.delta:  # Windows and Mac 
             self.txt_input_field.text.yview_scroll(-1 * int(event.delta / 120), "units")
         else:  # Linux
@@ -106,12 +105,13 @@ class AppView(ttk.Frame):
         self.update_entry_positions()
     
     def update_entry_positions(self):
+        """updates visible entries, places them on their word in the text"""
         for entry, index in self.model.entries:
             entry: NamedEntry
             bbox = self.txt_input_field.bbox(index)
             if bbox is not None:
                 # Entry is visible, update position
-                entry.place(x=bbox[0], y=bbox[1], width=entry.get_width(), height=35)
+                entry.place(x=bbox[0], y=bbox[1], width=entry.get_width(), height=30)
                 entry.lift()  # Ensure the entry is on top of the text widget
             else:
                 # Entry is out of view, hide it
