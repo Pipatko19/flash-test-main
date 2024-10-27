@@ -4,7 +4,7 @@ class NamedEntry(ttk.Entry):
     def __init__(self, word: str, width: int, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.word = word
-        self.set_width = width + 2
+        self.set_width = width + 4
 
         self.bind("<FocusOut>", self.unfocus)
         self.placeholder = self.word[0] + "-" * (len(self.word) - 1)
@@ -15,10 +15,9 @@ class NamedEntry(ttk.Entry):
         self.delete(0, ttk.END)
         self.insert(0, self.placeholder)
         
-    def _test(self):
+    def correct_update(self):
         self.delete(0, ttk.END)
         self.insert(0, self.word)
-        return self.word
         
     def get_width(self):
         return self.set_width
@@ -26,12 +25,14 @@ class NamedEntry(ttk.Entry):
     def unfocus(self, event):
         cur_value = self.get().strip().lower()
         if cur_value == "skip":
-            cur_value = self._test()
-        if not cur_value or cur_value == self.placeholder:
+            cur_value = self.word.lower()
+        if not cur_value or cur_value == self.placeholder: #empty
             self.insert_placeholder()
             self.config(style="Primary.TEntry")
-        elif cur_value == self.word:
+
+        elif cur_value == self.word.lower():
             self.config(style="Correct.TEntry")
+            self.correct_update()
         else:
             self.config(style="Wrong.TEntry")
     

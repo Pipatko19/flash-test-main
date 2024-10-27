@@ -39,7 +39,7 @@ class AppView(ttk.Frame):
         lbl_upper_text = ttk.Label(lfm_upper, text= "Text Randomizer", font=("garamond", 30, "bold"), padding=10)
 
         self.txt_input_field: tk.Text = ScrolledText(self.frm_display, font="garamond 12", autohide=True)
-        self.default_font = tkinter.font.Font(family="garamond", size=9)
+        self.default_font = tkinter.font.Font(family="garamond", size=12)
         
         self.frm_display.grid(column=0, row=0, columnspan=3, sticky="ew")        
         lfm_upper.pack()
@@ -66,7 +66,7 @@ class AppView(ttk.Frame):
         return self.txt_input_field.get("1.0", tk.END)
     
     
-    def create_entry(self, word: str, indices: list[str | float]) -> None:
+    def create_entry(self, indices: list[str | float]) -> None:
         """replaces the word at the indices with an entry.
         Fuckin nefunguje protože word je lemma ne normální token aaaaaah
 
@@ -74,17 +74,20 @@ class AppView(ttk.Frame):
             word (str): word
             indices (list[str  |  float]): starting and ending index
         """
+        word = self.txt_input_field.get(*indices)
         width = self._calculate_width(word)
+
         print("width:", width)
-        
         entry = NamedEntry(word, width, master=self.txt_input_field, font=('garamond', 9))
         entry.insert_placeholder()
         self.model.entries.append((entry, indices[0]))
 
         
         bbox = self.txt_input_field.bbox(indices[0])
+            
         if bbox is not None:
             start_x, y, width, height = bbox
+            print("real width:", width)
             #end_x = self.txt_input_field.bbox(indices[1])[0]
             entry.place(x=start_x - 3, y=y, width=entry.get_width(), height=30)
 
@@ -108,7 +111,7 @@ class AppView(ttk.Frame):
             bbox = self.txt_input_field.bbox(index)
             if bbox is not None:
                 # Entry is visible, update position
-                entry.place(x=bbox[0], y=bbox[1], width=entry.get_width(), height=30)
+                entry.place(x=bbox[0], y=bbox[1], width=entry.get_width(), height=35)
                 entry.lift()  # Ensure the entry is on top of the text widget
             else:
                 # Entry is out of view, hide it

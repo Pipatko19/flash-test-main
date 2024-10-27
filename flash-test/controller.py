@@ -43,7 +43,7 @@ class AppController:
         """finds the starting and ending indices of each word."""
         word_indices = []
         start_index = [1, 0]
-        between_symbols = {"-", "/", "="}
+        between_symbols = {"-", "/", "=", ";", ".", ","}
         past_char_count = 0
         for i in range(len(test_str)):
             if re.match(r'^[^\w]+$', test_str[i]):
@@ -53,7 +53,9 @@ class AppController:
                     if start_index[1] != i:
                         proc_start = list(start_index)
                         proc_start[1] -= past_char_count
-                        word_indices.append((".".join(map(str, proc_start)), str(start_index[0]) + "." + str(i - past_char_count)))
+                        
+                        word_indices.append((".".join(map(str, proc_start)), 
+                                             str(start_index[0]) + "." + str(i - past_char_count)))
                 if test_str[i] == "\n":
                     start_index[0] += 1
                     past_char_count = i + 1
@@ -63,6 +65,8 @@ class AppController:
             proc_start = list(start_index)
             proc_start[1] -= past_char_count
             word_indices.append((".".join(map(str, proc_start)), str(start_index[0]) + "." + str(len(test_str) - past_char_count)))
+        
+        print("registered words:", *(self.view.txt_input_field.get(start, end) for start, end in word_indices), sep=", ")
         return word_indices
 
     def convert(self) -> None:
@@ -82,7 +86,7 @@ class AppController:
                 if word not in self.model.word_data:
                     continue
                 if np.log10(self.model.word_data[word]) < self.model.score_bound:
-                    self.view.create_entry(word, word_indices[idx])
+                    self.view.create_entry(word_indices[idx])
                     
     def open_settings(self):
         """Creates settings window."""
