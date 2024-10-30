@@ -2,7 +2,6 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from model import AppModel
 from settings.blacklist import BlacklistUI
-from settings.toggleables import Toggleables
 
 class Settings(ttk.Toplevel):
     """Change how the program determines uncommon words."""
@@ -26,8 +25,13 @@ class Settings(ttk.Toplevel):
         scl_bound.grid(column=0, row=1)
         self.lbl_cur_coeficient.grid(column=1, row=1, padx=8)
         
-        self.hidings = Toggleables(self.model, frm_padding)
-        self.hidings.grid(column=0, row=1, sticky="n")
+        hidings = ttk.Frame(frm_padding)
+        hidings.grid(column=0, row=1, sticky="n")
+        
+        chk_names = ttk.Checkbutton(hidings, text="Hide Names", variable=model.hide_names, style="round.toggle")
+        chk_names.pack()
+        chk_unknows = ttk.Checkbutton(hidings, text="Hide Unknown Words", variable=model.hide_unknowns, style="round.toggle")
+        chk_unknows.pack()
 
         
         self.black_list = BlacklistUI(self.model, frm_padding)

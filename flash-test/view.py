@@ -135,7 +135,7 @@ class AppView(ttk.Frame):
         self.txt_input_field.text.config(state=tk.NORMAL)
     
     def clear_txt(self):
-        print("REMVOE")
+        print("Removed text")
         self.txt_input_field.delete("1.0", tk.END)
 
 if __name__ == "__main__":
