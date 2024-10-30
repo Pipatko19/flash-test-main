@@ -4,15 +4,44 @@ import numpy as np
 from model import AppModel
 from view import AppView
 from settings.settings_main import Settings
+from entry_name import NamedEntry
+from tkinter import BooleanVar
 
 class AppController:
     def __init__(self, model: AppModel, view: AppView) -> None:
         self.model = model
         self.view = view
+        self.view.btn_clear.config(command=self.reset_all)
         self.view.btn_randomizer.config(command=self.convert)
         self.view.btn_settings.config(command=self.open_settings)
         self.view.pack(expand=True, fill='both')
-
+        self.view.bind_all("<Return>", self.focus_next_entry)
+        self.view.bind_all("<Shift-Left>", self.focus_prev_entry)
+        self.view.bind_all("<Shift-Right>", self.focus_next_entry)
+        self.model.hide_names = BooleanVar(value=False)
+        self.model.hide_unknowns = BooleanVar(value=False)
+        
+    def check_all_done(self, event):
+        if event.widget.state:
+            for entry, idx in self.model.entries:
+                if not entry.state:
+                    return
+            self.view.create_winning_msg_box()
+            
+    def focus_next_entry(self, event):
+        widget: NamedEntry = event.widget
+        print("Registered widget:", widget.winfo_name())
+        if isinstance(widget, NamedEntry):
+            self.check_all_done(event)
+            if widget.idx < len(self.model.entries) - 1:
+                self.model.entries[widget.idx + 1][0].focus()
+                
+    def focus_prev_entry(self, event):
+        widget: NamedEntry = event.widget
+        print("Registered widget:", widget.winfo_name())
+        if isinstance(widget, NamedEntry):
+            if widget.idx > 0:
+                self.model.entries[widget.idx - 1][0].focus()
         
     def lower_bound(self, text: list) -> float:
         """calculate the lower bound on a logarithmic scale"""
@@ -36,7 +65,7 @@ class AppController:
         concat_text = " ¶ ".join(text.splitlines()) #why does it have to be so stupid
         #print("concat_text:", concat_text)
         lemmas = self.model.lemmatizator.get_lemmas(concat_text)
-        print("lemmas:", lemmas)
+        print("\nlemmas:", lemmas)
         return lemmas
     
     def _find_word_indices(self, text) -> list[str | float]:
@@ -62,27 +91,41 @@ class AppController:
                     i += word_length 
                 else:
                     i += 1  # Move forward if no match
-        print("INDEXES:", *(self.view.txt_input_field.get(start,end) for start, end in word_indexes), sep=", ")
+        print("\nINDEXES:", *(self.view.txt_input_field.get(start,end) for start, end in word_indexes), sep=", ")
         return word_indexes
 
+    def _reset(self) -> None:
+        self.model.clear_entries()
+        self.view.enable_txt()
+    
+    def reset_all(self) -> None:
+        self._reset()
+        self.view.clear_txt()
+    
     def convert(self) -> None:
         """Hides the least common words in the text field."""
-        self.model.clear_entries()
-        print(self.model.entries)
+        self._reset()
+        self.view.disable_txt()
+        
         text = self.view.get_txt_input()
         self.model.user_text = text
         word_indices = self._find_word_indices(text)
         lemmas = self._format_lemmas(text)
-        self.model.score_bound = self.lower_bound(lemmas)
+        lower_bound = self.lower_bound(lemmas)
         for idx, word in enumerate(lemmas):
-            print(word)
             if word not in self.model.blacklist and word.isalpha() and len(word) > 3:
                 if word[0].isupper():
+                    if self.model.hide_names.get():
+                        self.view.create_entry(word_indices[idx], tag="WARNING.TEntry")
                     continue
+                    
                 if word not in self.model.word_data:
+                    if self.model.hide_unknowns.get():
+                        self.view.create_entry(word_indices[idx], tag="DANGER.TEntry")
                     continue
-                if np.log10(self.model.word_data[word]) < self.model.score_bound:
-                    self.view.create_entry(word_indices[idx])
+                elif np.log10(self.model.word_data[word]) < lower_bound:
+                    self.view.create_entry(word_indices[idx], tag="PRIMARY.TEntry")
+
                     
     def open_settings(self):
         """Creates settings window."""

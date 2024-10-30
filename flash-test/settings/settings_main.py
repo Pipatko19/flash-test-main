@@ -2,6 +2,7 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from model import AppModel
 from settings.blacklist import BlacklistUI
+from settings.toggleables import Toggleables
 
 class Settings(ttk.Toplevel):
     """Change how the program determines uncommon words."""
@@ -24,6 +25,9 @@ class Settings(ttk.Toplevel):
         lbl_scale_title.grid(column=0, row=0, columnspan=1)
         scl_bound.grid(column=0, row=1)
         self.lbl_cur_coeficient.grid(column=1, row=1, padx=8)
+        
+        self.hidings = Toggleables(self.model, frm_padding)
+        self.hidings.grid(column=0, row=1, sticky="n")
 
         
         self.black_list = BlacklistUI(self.model, frm_padding)
@@ -31,6 +35,7 @@ class Settings(ttk.Toplevel):
         
         btn_save = ttk.Button(frm_padding, text="Save", command=model.save_blacklist, style="secondary.tButton")
         btn_save.grid(column=1, row=2)
+
         
         
     def update_coeficient(self, val: str):

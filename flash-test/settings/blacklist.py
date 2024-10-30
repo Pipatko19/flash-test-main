@@ -4,9 +4,9 @@ import tkinter as tk
 from model import AppModel
 
 class BlacklistUI(ttk.Frame):
-    def __init__(self, model:AppModel, master=None, *args, **kwargs) -> None:
+    def __init__(self, model:AppModel, master=None, **kwargs) -> None:
         self.model = model
-        super().__init__(master, *args, **kwargs)
+        super().__init__(master, **kwargs)
         lbl_change = ttk.Label(self, text="Blacklist")
         lbl_change.pack()
         

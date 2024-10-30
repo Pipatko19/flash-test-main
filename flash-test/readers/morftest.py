@@ -19,7 +19,7 @@ class Lemmatizator:
     def tokenize(self, text: str) -> list[str]:
         """Tokenizes the text (splits it, but also removes white space symbols)"""
         tokenized_text = nltk.word_tokenize(text)
-        print("tokenized text:", tokenized_text)
+        print("\ntokenized text:", tokenized_text)
         return tokenized_text
     
     def lemmatize(self, text: str) -> str:

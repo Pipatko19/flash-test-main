@@ -4,6 +4,7 @@ import ttkbootstrap as ttk
 from PIL import ImageTk
 from ttkbootstrap import constants as cn
 from ttkbootstrap.scrolled import ScrolledText
+from ttkbootstrap.dialogs.dialogs import Messagebox
 import tkinter.font
 
 from model import AppModel
@@ -31,6 +32,7 @@ class AppView(ttk.Frame):
         style.configure("Wrong.TEntry", fieldbackground="#ffb3b3")
         style.configure("Correct.TEntry", fieldbackground="#b3ffb3")
         
+        
         self.frm_display = ttk.Frame(self)
         lfm_upper = ttk.LabelFrame(self.frm_display, text="title", style=cn.WARNING)
 
@@ -43,6 +45,9 @@ class AppView(ttk.Frame):
         lfm_upper.pack()
         lbl_upper_text.pack()
         self.txt_input_field.pack(fill="both", expand=True, padx=20)
+        
+        self.btn_clear = ttk.Button(self, text="Clear", style=("Secondary.TButton"))
+        self.btn_clear.grid(column=0, row=1, padx=10, ipadx=8, ipady=4)
         
         self.btn_randomizer = ttk.Button(self, text="Convert", width=20, style=("Random.TButton"))
         self.btn_randomizer.grid(column=1, row=1, ipadx=50, ipady=10, pady=10)
@@ -59,12 +64,17 @@ class AppView(ttk.Frame):
         self.txt_input_field.bind_all('<Button-4>', self.on_mouse_wheel)    # For Linux (scroll up)
         self.txt_input_field.bind_all('<Button-5>', self.on_mouse_wheel)    # For Linux (scroll down)
         
+    def create_winning_msg_box(self):
+        """Display a congratulating messagebox"""
+        Messagebox.ok("Congratulations, all is correct!")
+
+    
     def get_txt_input(self):
         """return text from the text field"""
         return self.txt_input_field.get("1.0", tk.END)
     
     
-    def create_entry(self, indices: list[str | float]) -> None:
+    def create_entry(self, indices: list[str | float], tag) -> None:
         """replaces the word at the indices with an entry.
         Fuckin nefunguje protože word je lemma ne normální token aaaaaah
 
@@ -75,8 +85,7 @@ class AppView(ttk.Frame):
         word = self.txt_input_field.get(*indices)
         width = self._calculate_width(word)
 
-        print("width:", width)
-        entry = NamedEntry(word, width, master=self.txt_input_field, font=('garamond', 9))
+        entry = NamedEntry(word, width, len(self.model.entries), master=self.txt_input_field, font=('garamond', 9), style=tag)
         entry.insert_placeholder()
         self.model.entries.append((entry, indices[0]))
 
@@ -85,7 +94,6 @@ class AppView(ttk.Frame):
             
         if bbox is not None:
             start_x, y, width, height = bbox
-            print("real width:", width)
             #end_x = self.txt_input_field.bbox(indices[1])[0]
             entry.place(x=start_x - 3, y=y, width=entry.get_width(), height=30)
 
@@ -120,6 +128,15 @@ class AppView(ttk.Frame):
     def _calculate_width(self, word):
         return self.default_font.measure(word)
 
+    def disable_txt(self):
+        self.txt_input_field.text.config(state=tk.DISABLED)
+    
+    def enable_txt(self):
+        self.txt_input_field.text.config(state=tk.NORMAL)
+    
+    def clear_txt(self):
+        print("REMVOE")
+        self.txt_input_field.delete("1.0", tk.END)
 
 if __name__ == "__main__":
     app = ttk.Window(themename='simplex')
