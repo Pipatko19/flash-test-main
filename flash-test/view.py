@@ -34,9 +34,9 @@ class AppView(ttk.Frame):
         
         
         self.frm_display = ttk.Frame(self)
-        lfm_upper = ttk.LabelFrame(self.frm_display, text="title", style=cn.WARNING)
+        lfm_upper = ttk.LabelFrame(self.frm_display, text="MorphoDiTa's", style=cn.WARNING)
 
-        lbl_upper_text = ttk.Label(lfm_upper, text= "Text Randomizer", font=("garamond", 30, "bold"), padding=10)
+        lbl_upper_text = ttk.Label(lfm_upper, text= "Flash Randomizer", font=("garamond", 30, "bold"), padding=10)
 
         self.txt_input_field: tk.Text = ScrolledText(self.frm_display, font="garamond 12", autohide=True)
         self.default_font = tkinter.font.Font(family="garamond", size=12)
